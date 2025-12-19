@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gate Control</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    button { margin: 6px 6px 6px 0; padding: 10px 16px; }
+    input { padding: 10px; width: 220px; }
+    pre { background: #f4f4f4; padding: 12px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <h2>Gate Control</h2>
+
+  <button onclick="sendAction('open')">OPEN</button>
+  <button onclick="sendAction('status')">STATUS</button>
+
+  <div style="margin-top:12px;">
+    <input id="pass" placeholder="New pass (4 digits 1-3)" />
+    <button onclick="setPass()">SET PASS</button>
+  </div>
+
+  <pre id="out" style="margin-top:12px;">Ready.</pre>
+
+  <script>
+    // IMPORTANT: This is just for quick testing.
+    // Later we can make login protection.
+    const API_KEY = prompt("Enter API key:");
+
+    async function sendAction(action) {
+      const res = await fetch("/.netlify/functions/gate", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-api-key": API_KEY
+        },
+        body: JSON.stringify({ action })
+      });
+      document.getElementById("out").textContent = await res.text();
+    }
+
+    async function setPass() {
+      const pass = document.getElementById("pass").value.trim();
+      const res = await fetch("/.netlify/functions/gate", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-api-key": API_KEY
+        },
+        body: JSON.stringify({ action: "setpass", pass })
+      });
+      document.getElementById("out").textContent = await res.text();
+    }
+  </script>
+</body>
+</html>
